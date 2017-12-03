@@ -19,7 +19,7 @@ class MainWindow(Gtk.Window) :
         global services
         Gtk.Window.__init__(self, title="Authentificator")
         self.set_border_width(50)
-        
+
         # Headerbar
         self.header_bar = Gtk.HeaderBar()
         self.header_bar.set_show_close_button(True)
@@ -37,15 +37,6 @@ class MainWindow(Gtk.Window) :
         self.header_bar.pack_start(self.delete_button)
 
 
-        # Box with the list inside
-
-        # self.box = Gtk.Box(spacing=10)
-        # self.add(self.box)
-        #
-        # self.lab = Gtk.Label(label='Some text')
-        # self.box.pack_start(self.lab, True, True, 0)
-
-
         # List of services
 
         codes_listbox = Gtk.ListBox()
@@ -58,19 +49,6 @@ class MainWindow(Gtk.Window) :
         self.listboxrows = dict()
 
         remainingTime = 30 - ( int(time.time()) ) % 30
-
-        # for service in services :
-        #     row = Gtk.ListBoxRow()
-        #     grid = Gtk.Grid()
-        #     row.add(grid)
-        #     code = Gtk.Label(label=getTotpCode(keyring.get_password(SERVICENAME, service)))
-        #     name = Gtk.Label(label=service)
-        #     remaining_time = Gtk.Label(label=str(remainingTime))
-        #     grid.attach(code, 0, 0, 1, 10)
-        #     grid.attach_next_to(name, code, Gtk.PositionType.BOTTOM, 1, 10)
-        #     grid.attach_next_to(remaining_time, code, Gtk.PositionType.RIGHT, 1, 1)
-        #     codes_listbox.add(row)
-        #     self.listboxrows[service] = row, grid, code, name, remaining_time # Use a tuple to add a to_show value in the future ?
 
         for service in services :
             row = Gtk.ListBoxRow()
