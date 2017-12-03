@@ -80,14 +80,16 @@ class MainWindow(Gtk.Window) :
             mainBox.add(mainGrid)
             row.add(mainBox)
 
-            code = Gtk.Label(label=getTotpCode(keyring.get_password(SERVICENAME, service)))
+            code = Gtk.Label()
+            code.set_markup('<big><b>'+getTotpCode(keyring.get_password(SERVICENAME, service))+'</b></big>')
             name = Gtk.Label(label=service)
             code_and_name = Gtk.Grid()
             code_and_name.attach(code, 0, 0, 1, 1)
             code_and_name.attach_next_to(name, code, Gtk.PositionType.BOTTOM, 1, 1)
 
             time_box = Gtk.Box(spacing=5)
-            remaining_time = Gtk.Label(label=str(remainingTime))
+            remaining_time = Gtk.Label()
+            remaining_time.set_markup('<big>'+str(remainingTime)+'</big>')
             time_box.add(remaining_time)
 
             mainGrid.attach(code_and_name, 0, 0, 1, 1)
@@ -112,12 +114,12 @@ class MainWindow(Gtk.Window) :
 
         for service in services :
             # Refresh timer
-            self.listboxrows[service][3].set_label(str(remainingTime))
+            self.listboxrows[service][3].set_markup('<big>'+str(remainingTime)+'</big>')
 
         if remainingTime == 30 or force :
             # Refresh One-Time code
             for service in services :
-                self.listboxrows[service][1].set_label(getTotpCode(keyring.get_password(SERVICENAME, service)))
+                self.listboxrows[service][1].set_markup('<big><b>'+getTotpCode(keyring.get_password(SERVICENAME, service))+'</b></big>')
 
 
 
