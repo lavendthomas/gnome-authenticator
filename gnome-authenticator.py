@@ -21,20 +21,20 @@ class MainWindow(Gtk.Window) :
         self.set_border_width(50)
 
         # Headerbar
-        header_bar = Gtk.HeaderBar()
-        header_bar.set_show_close_button(True)
-        header_bar.props.title = 'Authentificator'
-        self.set_titlebar(header_bar)
+        self.header_bar = Gtk.HeaderBar()
+        self.header_bar.set_show_close_button(True)
+        self.header_bar.props.title = 'Authentificator'
+        self.set_titlebar(self.header_bar)
 
         # New button
-        new_button = Gtk.Button(label='New')
-        new_button.connect("clicked", self.new_service_window)
-        header_bar.pack_start(new_button)
+        self.new_button = Gtk.Button(label='New')
+        self.new_button.connect("clicked", self.new_service_window)
+        self.header_bar.pack_start(self.new_button)
 
         # Delete Button
-        delete_button = Gtk.Button(label='Delete')
-        delete_button.connect("clicked", self.remove_service_window)
-        header_bar.pack_start(delete_button)
+        self.delete_button = Gtk.Button(label='Delete')
+        self.delete_button.connect("clicked", self.remove_service_window)
+        self.header_bar.pack_start(self.delete_button)
 
 
         # Box with the list inside
@@ -98,11 +98,11 @@ class MainWindow(Gtk.Window) :
 
 
 
-    def new_service_window(self) :
+    def new_service_window(self, widget) :
         print('New !')
         pass
 
-    def remove_service_window(self) :
+    def remove_service_window(self, widget) :
         print('Remove !')
         pass
 
