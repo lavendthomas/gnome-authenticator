@@ -17,12 +17,24 @@ class MainWindow(Gtk.Window) :
 
     def __init__(self) :
         global services
-
         Gtk.Window.__init__(self, title="Authentificator")
-        self.set_border_width(10)
+        self.set_border_width(50)
 
         # Headerbar
+        header_bar = Gtk.HeaderBar()
+        header_bar.set_show_close_button(True)
+        header_bar.props.title = 'Authentificator'
+        self.set_titlebar(header_bar)
 
+        # New button
+        new_button = Gtk.Button(label='New')
+        new_button.connect("clicked", self.new_service_window)
+        header_bar.pack_start(new_button)
+
+        # Delete Button
+        delete_button = Gtk.Button(label='Delete')
+        delete_button.connect("clicked", self.remove_service_window)
+        header_bar.pack_start(delete_button)
 
 
         # Box with the list inside
