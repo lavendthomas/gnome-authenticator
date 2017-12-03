@@ -19,8 +19,7 @@ class MainWindow(Gtk.Window) :
         global services
         Gtk.Window.__init__(self, title="Authentificator")
         self.set_border_width(50)
-        self.set_resizable(False) # TODO Make it support resize
-
+        
         # Headerbar
         self.header_bar = Gtk.HeaderBar()
         self.header_bar.set_show_close_button(True)
