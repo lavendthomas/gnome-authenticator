@@ -107,27 +107,25 @@ class MainWindow(Gtk.Window) :
         content_area = self.new_service.get_content_area()
         content_area.set_border_width(18)
 
-        main_grid = Gtk.Grid(column_spacing=12)
+        main_grid = Gtk.Grid(column_spacing=6, row_spacing=12)
         content_area.add(main_grid)
 
 
-        vbox_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         name_label = Gtk.Label(label='Name')
-        name_label.set_justify(Gtk.Justification.RIGHT)
+        name_label.set_xalign(1)
+        main_grid.attach(name_label, 0, 0, 1, 1)
+
+
         key_label = Gtk.Label(label='Secret key')
-        key_label.set_justify(Gtk.Justification.RIGHT)
-        vbox_left.pack_start(name_label, True, True, 0)
-        vbox_left.pack_start(key_label, True, True, 0)
-        main_grid.attach(vbox_left, 0, 0, 1, 1)
+        key_label.set_xalign(1)
+        main_grid.attach(key_label, 0, 1, 1, 1)
 
-
-        vbox_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self.service_entry = Gtk.Entry()
+        main_grid.attach(self.service_entry, 1, 0, 1, 1)
+
         self.secret_key = Gtk.Entry()
         self.secret_key.set_visibility(False)
-        vbox_right.pack_start(self.service_entry, True, True, 0)
-        vbox_right.pack_start(self.secret_key, True, True, 0)
-        main_grid.attach_next_to(vbox_right, vbox_left, Gtk.PositionType.RIGHT, 1, 1)
+        main_grid.attach(self.secret_key, 1, 1, 1, 1)
 
         self.new_service.resize(30,30)
         self.new_service.set_resizable(False)
