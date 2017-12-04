@@ -76,8 +76,6 @@ class MainWindow(Gtk.Window) :
             codes_listbox.add(row)
             self.listboxrows[service] = row, code, name, remaining_time # Use a tuple to add a to_show value in the future ?
 
-
-
     def new_service_window(self, widget) :
         self.new_service = Gtk.Dialog()
         self.new_service.set_transient_for(self)
@@ -101,8 +99,6 @@ class MainWindow(Gtk.Window) :
         header_bar.pack_end(ok_button)
 
         # End of the HeaderBar
-
-        #TODO Use Grid instead of a listbox
 
         content_area = self.new_service.get_content_area()
         content_area.set_border_width(18)
@@ -131,8 +127,6 @@ class MainWindow(Gtk.Window) :
         self.new_service.set_resizable(False)
         self.new_service.show_all()
 
-
-
     def cancel_new_service_window(self, widget) :
         self.new_service.destroy()
 
@@ -146,6 +140,7 @@ class MainWindow(Gtk.Window) :
         if new_service in services :
             pass # TODO Display an in-app notificaton
         else :
+            allow_refresh = False
             services.append(new_service)
             services.sort()
             jsonSaveList.save(services, SERVICESFILE)
@@ -154,11 +149,61 @@ class MainWindow(Gtk.Window) :
 
             #TODO Add to the listbox
 
+            allow_refresh = True
+
         self.new_service.destroy()
 
-
     def remove_service_window(self, widget) :
-        print('Remove !')
+        global services
+
+        self.remove_service = Gtk.Dialog()
+        self.remove_service.set_transient_for(self)
+        self.remove_service.set_modal(True)
+
+        # HeaderBar
+
+        header_bar = Gtk.HeaderBar()
+        header_bar.set_show_close_button(False)
+        header_bar.props.title = 'Delete'
+        self.remove_service.set_titlebar(header_bar)
+
+        # Add buttons and remove native x button
+
+        cancel_button = Gtk.Button(label='Cancel')
+        cancel_button.connect('clicked', self.cancel_remove_service_window)
+        header_bar.pack_start(cancel_button)
+
+        ok_button = Gtk.Button(label='Ok')
+        ok_button.connect('clicked', self.ok_remove_service_window)
+        header_bar.pack_end(ok_button)
+
+        # End of the HeaderBar
+
+        content_area = self.remove_service.get_content_area()
+        content_area.set_border_width(0)
+
+        self.remove_listbox = Gtk.ListBox()
+        self.remove_listbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
+        self.remove_listbox.set_border_width(100)
+        content_area.add(self.remove_listbox)
+
+        for service in services :
+            row = Gtk.ListBoxRow()
+            label = Gtk.Label()
+            label.set_markup('<big>'+service+'</big>')
+            row.add(label)
+            self.remove_listbox.add(row)
+
+        self.remove_service.resize(30,30)
+        self.remove_service.set_resizable(False)
+        self.remove_service.show_all()
+
+
+    def cancel_remove_service_window(self, widget) :
+        self.remove_service.destroy()
+
+    def ok_remove_service_window(self, widget) :
+        pass
 
     def refresh_codes(self, force=False) :
         global services
@@ -217,12 +262,14 @@ def refreshCodes() :
     global windowClosed
     global window
     while not windowClosed :
-        window.refresh_codes()
-        time.sleep(1)
+        if allow_refresh :
+            window.refresh_codes()
+            time.sleep(1)
 
 
 services = jsonSaveList.load(SERVICESFILE)
 windowClosed = False
+allow_refresh = True # Used to temporarily prevent the code to refresh
 
 window = MainWindow()
 window.connect('delete-event', Gtk.main_quit)
