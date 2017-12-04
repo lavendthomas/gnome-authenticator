@@ -129,6 +129,8 @@ class MainWindow(Gtk.Window) :
         vbox_right.pack_start(self.secret_key, True, True, 0)
         main_grid.attach_next_to(vbox_right, vbox_left, Gtk.PositionType.RIGHT, 1, 1)
 
+        self.new_service.resize(30,30)
+        self.new_service.set_resizable(False)
         self.new_service.show_all()
 
 
@@ -137,7 +139,25 @@ class MainWindow(Gtk.Window) :
         self.new_service.destroy()
 
     def ok_new_service_window(self, widget) :
-        pass
+        global services
+
+        # Get values from user
+        new_service = self.service_entry.get_text()
+        new_key = self.secret_key.get_text()
+
+        if new_service in services :
+            pass # TODO Display an in-app notificaton
+        else :
+            services.append(new_service)
+            services.sort()
+            jsonSaveList.save(services, SERVICESFILE)
+
+            keyring.set_password(SERVICENAME, new_service, new_key)
+
+            #TODO Add to the listbox
+
+        self.new_service.destroy()
+
 
     def remove_service_window(self, widget) :
         print('Remove !')
