@@ -105,32 +105,77 @@ class MainWindow(Gtk.Window) :
         #TODO Use Grid instead of a listbox
 
         content_area = self.new_service.get_content_area()
-        content_area.set_border_width(5)
+        content_area.set_border_width(18)
 
-        listbox = Gtk.ListBox()
-        listbox.set_selection_mode(Gtk.SelectionMode.NONE)
-        content_area.add(listbox)
+        main_grid = Gtk.Grid(column_spacing=12)
+        content_area.add(main_grid)
 
-        service_row = Gtk.ListBoxRow()
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=100)
-        service_row.add(box)
-        label = Gtk.Label(label='Name of the service')
-        label.set_justify(Gtk.Justification.RIGHT)
+
+        vbox_left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        name_label = Gtk.Label(label='Name')
+        name_label.set_justify(Gtk.Justification.RIGHT)
+        key_label = Gtk.Label(label='Secret key')
+        key_label.set_justify(Gtk.Justification.RIGHT)
+        vbox_left.pack_start(name_label, True, True, 0)
+        vbox_left.pack_start(key_label, True, True, 0)
+        # content_area.add(vbox_left)
+        main_grid.attach(vbox_left, 0, 0, 1, 1)
+
+
+        vbox_right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self.service_entry = Gtk.Entry()
-        box.pack_start(label, True, True, 0)
-        box.pack_start(self.service_entry, True, True, 0)
-        listbox.add(service_row)
-
-        secret_key_row = Gtk.ListBoxRow()
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=100)
-        secret_key_row.add(box)
-        label = Gtk.Label(label='Secret key')
-        label.set_justify(Gtk.Justification.RIGHT)
         self.secret_key = Gtk.Entry()
         self.secret_key.set_visibility(False)
-        box.pack_start(label, True, True, 0)
-        box.pack_start(self.secret_key, True, True, 0)
-        listbox.add(secret_key_row)
+        vbox_right.pack_start(self.service_entry, True, True, 0)
+        vbox_right.pack_start(self.secret_key, True, True, 0)
+        # content_area.add(vbox_right)
+        main_grid.attach_next_to(vbox_right, vbox_left, Gtk.PositionType.RIGHT, 1, 1)
+
+
+        # hbox_service = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+        # label = Gtk.Label(label='Name')
+        # label.set_justify(Gtk.Justification.RIGHT)
+        # self.service_entry = Gtk.Entry()
+        # hbox_service.pack_start(label, True, True, 0)
+        # hbox_service.pack_end(self.service_entry, True, True, 0)
+        # content_area.add(hbox_service)
+        #
+        # hbox_sercret_key = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+        # label = Gtk.Label(label='Secret key')
+        # label.set_justify(Gtk.Justification.RIGHT)
+        # self.secret_key = Gtk.Entry()
+        # self.secret_key.set_visibility(False)
+        # hbox_sercret_key.pack_start(label, True, True, 0)
+        # hbox_sercret_key.pack_end(self.secret_key, True, True, 0)
+        # content_area.add(hbox_sercret_key)
+
+
+
+
+        # listbox = Gtk.ListBox()
+        # listbox.set_selection_mode(Gtk.SelectionMode.NONE)
+        # content_area.add(listbox)
+        #
+        # service_row = Gtk.ListBoxRow()
+        # box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=100)
+        # service_row.add(box)
+        # label = Gtk.Label(label='Name of the service')
+        # label.set_justify(Gtk.Justification.RIGHT)
+        # self.service_entry = Gtk.Entry()
+        # box.pack_start(label, True, True, 0)
+        # box.pack_start(self.service_entry, True, True, 0)
+        # listbox.add(service_row)
+        #
+        # secret_key_row = Gtk.ListBoxRow()
+        # box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=100)
+        # secret_key_row.add(box)
+        # label = Gtk.Label(label='Secret key')
+        # label.set_justify(Gtk.Justification.RIGHT)
+        # self.secret_key = Gtk.Entry()
+        # self.secret_key.set_visibility(False)
+        # box.pack_start(label, True, True, 0)
+        # box.pack_start(self.secret_key, True, True, 0)
+        # listbox.add(secret_key_row)
 
         self.new_service.show_all()
 
