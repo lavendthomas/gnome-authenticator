@@ -17,6 +17,8 @@ class MainWindow(Gtk.Window) :
 
     def __init__(self) :
         global services
+        self.serviceslen = len(services) # Used to track if we have to rebuild the entire List of services
+
         Gtk.Window.__init__(self, title="Authentificator")
         self.set_border_width(50)
 
@@ -38,11 +40,14 @@ class MainWindow(Gtk.Window) :
 
 
         # List of services
+        self.gen_listbox_of_services()
 
-        codes_listbox = Gtk.ListBox()
-        codes_listbox.set_selection_mode(Gtk.SelectionMode.NONE)
-        codes_listbox.set_border_width(0)
-        self.add(codes_listbox)
+
+    def gen_listbox_of_services(self) :
+        self.codes_listbox = Gtk.ListBox()
+        self.codes_listbox.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.codes_listbox.set_border_width(0)
+        self.add(self.codes_listbox)
 
         # For eath service add a new item to the list
 
@@ -73,8 +78,9 @@ class MainWindow(Gtk.Window) :
             mainGrid.attach(code_and_name, 0, 0, 1, 1)
             mainGrid.attach_next_to(time_box, code_and_name, Gtk.PositionType.RIGHT, 1, 1  )
 
-            codes_listbox.add(row)
+            self.codes_listbox.add(row)
             self.listboxrows[service] = row, code, name, remaining_time # Use a tuple to add a to_show value in the future ?
+        self.show_all()
 
     def new_service_window(self, widget) :
         self.new_service = Gtk.Dialog()
@@ -132,6 +138,7 @@ class MainWindow(Gtk.Window) :
 
     def ok_new_service_window(self, widget) :
         global services
+        global allow_refresh
 
         # Get values from user
         new_service = self.service_entry.get_text()
@@ -147,9 +154,9 @@ class MainWindow(Gtk.Window) :
 
             keyring.set_password(SERVICENAME, new_service, new_key)
 
-            #TODO Add to the listbox
-
+            #Add to the listbox
             allow_refresh = True
+            self.refresh_codes(force=True)
 
         self.new_service.destroy()
 
@@ -189,34 +196,55 @@ class MainWindow(Gtk.Window) :
 
         for service in services :
             row = Gtk.ListBoxRow()
+            box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+            box.set_border_width(12)
             label = Gtk.Label()
             label.set_markup('<big>'+service+'</big>')
-            row.add(label)
+            box.add(label)
+            row.add(box)
             self.remove_listbox.add(row)
 
         self.remove_service.resize(30,30)
         self.remove_service.set_resizable(False)
         self.remove_service.show_all()
 
-
     def cancel_remove_service_window(self, widget) :
         self.remove_service.destroy()
 
     def ok_remove_service_window(self, widget) :
-        pass
+        global services
+        global allow_refresh
+        service_to_delete = self.remove_listbox.get_selected_row().get_children()[0].get_children()[0].get_text()
+
+        allow_refresh = False
+
+        keyring.delete_password(SERVICENAME,service_to_delete)
+        services.remove(service_to_delete)
+        jsonSaveList.save(services, SERVICESFILE)
+
+        allow_refresh = True
+        self.refresh_codes(force=True)
+
+        self.remove_service.destroy()
 
     def refresh_codes(self, force=False) :
         global services
-        remainingTime = 30 - ( int(time.time()) ) % 30
+        if len(services) == self.serviceslen : # Not service added or remove so just update the values
+            remainingTime = 30 - ( int(time.time()) ) % 30
 
-        for service in services :
-            # Refresh timer
-            self.listboxrows[service][3].set_markup('<big>'+str(remainingTime)+'</big>')
-
-        if remainingTime == 30 or force :
-            # Refresh One-Time code
             for service in services :
-                self.listboxrows[service][1].set_markup('<big><b>'+getTotpCode(keyring.get_password(SERVICENAME, service))+'</b></big>')
+                # Refresh timer
+                self.listboxrows[service][3].set_markup('<big>'+str(remainingTime)+'</big>')
+
+            if remainingTime == 30 or force :
+                # Refresh One-Time code
+                for service in services :
+                    self.listboxrows[service][1].set_markup('<big><b>'+getTotpCode(keyring.get_password(SERVICENAME, service))+'</b></big>')
+        else : # rebuild the main services listbox from __init__
+            # self.remove(self.codes_listbox)
+            self.codes_listbox.destroy()
+            self.gen_listbox_of_services()
+            self.serviceslen = len(services)
 
 # class NewServiceWindow(Gtk.Dialog) :
 #     def __int__(self, parent) :
@@ -258,13 +286,14 @@ def getTotpCode(secret) :
     totp = totp = pyotp.TOTP(secret)
     return totp.now() # The code is a str, not an int
 
-def refreshCodes() :
+def refreshCodes(manual=False) :
     global windowClosed
     global window
     while not windowClosed :
         if allow_refresh :
             window.refresh_codes()
-            time.sleep(1)
+            if not manual :
+                time.sleep(1)
 
 
 services = jsonSaveList.load(SERVICESFILE)
