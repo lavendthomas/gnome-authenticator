@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 SERVICESFILE = 'services.json'
-SERVICENAME = 'simple-authentificator'
+SERVICENAME = 'gnome-authentificator'
 
 import gi
 gi.require_version('Gtk', '3.0')
