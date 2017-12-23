@@ -145,18 +145,45 @@ class MainWindow(Gtk.Window) :
         new_key = self.secret_key.get_text()
 
         if new_service in services :
-            pass # TODO Display an in-app notificaton
+            # TODO Display an in-app notificaton
+            already_added_dialog = Gtk.MessageDialog(parent=self,
+                                          flags=Gtk.DialogFlags.MODAL,
+                                          type=Gtk.MessageType.INFO,
+                                          buttons=Gtk.ButtonsType.OK,
+                                          message_format=new_service+" was already added. Please use another name.")
+                                          #title="Name conflict")
+            already_added_dialog.connect("response", self.ok_dialog)
+            already_added_dialog.show()
         else :
+
             allow_refresh = False
             services.append(new_service)
             services.sort()
             jsonSaveList.save(services, SERVICESFILE)
 
-            keyring.set_password(SERVICENAME, new_service, new_key)
+            keyring.set_password(SERVICENAME, new_service, cleanSecret(new_key))
 
             #Add to the listbox
             allow_refresh = True
-            self.refresh_codes(force=True)
+            try :
+                self.refresh_codes(force=True)
+            except ValueError as e :
+                services.remove(new_service)
+                jsonSaveList.save(services, SERVICESFILE)
+                keyring.delete_password(SERVICENAME, new_service)
+
+                bad_key_dialog = Gtk.MessageDialog(parent=self,
+                                              flags=Gtk.DialogFlags.MODAL,
+                                              type=Gtk.MessageType.ERROR,
+                                              buttons=Gtk.ButtonsType.OK,
+                                              message_format="Please check your key.\n\nError message :\n"+str(e))
+                bad_key_dialog.connect("response", self.ok_dialog)
+                bad_key_dialog.show()
+
+
+                self.codes_listbox.destroy()
+                self.gen_listbox_of_services()
+                start_refresh()
 
         self.new_service.destroy()
 
@@ -226,6 +253,9 @@ class MainWindow(Gtk.Window) :
         self.refresh_codes(force=True)
 
         self.remove_service.destroy()
+
+    def ok_dialog(self, widget, response_id) :
+        widget.destroy()
 
     def refresh_codes(self, force=False) :
         global services
@@ -300,12 +330,16 @@ services = jsonSaveList.load(SERVICESFILE)
 windowClosed = False
 allow_refresh = True # Used to temporarily prevent the code to refresh
 
+
 window = MainWindow()
 window.connect('delete-event', Gtk.main_quit)
 window.show_all()
 
-refreshCodesThread = threading.Thread(target=refreshCodes)
-refreshCodesThread.start()
+def start_refresh() :
+    refreshCodesThread = threading.Thread(target=refreshCodes)
+    refreshCodesThread.start()
+
+start_refresh()
 
 Gtk.main()
 windowClosed = True
